@@ -24,7 +24,7 @@ body {
 .board {
   font-size: 38px;
   position: relative;
-  top: -25px;
+  top: -100px;
 }
 
 .clue {
@@ -41,6 +41,8 @@ input {
   max-width: 40px;
   text-align: center;
   background-color: rgba(0, 0, 0, 0.05);
+  
+  border-radius: 0;
 }
 
 input:focus {
@@ -50,23 +52,22 @@ input:focus {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -100px;
+  bottom: -200%;
 }
 
 .buttonBar .submit {
   font-family: inherit;
-  padding: 10px 20px;
+  padding: 7px 18px;
   font-size: 18px;
   text-align: center;
   cursor: pointer;
   outline: none;
   color: #fff;
   font-weight: bold;
-  background-color: #2f9833;
+  background-color: #17866a;
   border: 2px solid black;
   border-radius: 50px;
   transition: all 0.3s;
-  text-transform: uppercase;
 }
 
 .buttonBar .submit:hover {
@@ -80,4 +81,5 @@ input:focus {
   transform: translateX(-50%);
   width: 100%;
   max-width: 650px;
+  text-transform: uppercase;
 }
