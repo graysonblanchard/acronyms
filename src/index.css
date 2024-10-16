@@ -1,13 +1,105 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Montserrat", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.header {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: 300px;
+  padding: 12px 0 18px 0;
+  border-bottom: 1px solid gray;
+}
+
+.board {
+  font-size: 38px;
+  position: relative;
+  top: -25px;
+}
+
+.clue {
+  letter-spacing: 12px;
+}
+
+input {
+  width: fit-content;
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  border-bottom: 2px solid #000;
+  padding: 0;
+  max-width: 40px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+input:focus {
+  outline: none;
+}
+.buttonBar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -100px;
+}
+
+.buttonBar .submit {
+  font-family: inherit;
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  font-weight: bold;
+  background-color: #2f9833;
+  border: 2px solid black;
+  border-radius: 50px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+
+.buttonBar .submit:hover {
+  background-color: #3e8e41;
+}
+
+.keyboard {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 800px;
+  max-height: 300px;
+}
+
+.keyboard .row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.keyboard button {
+  margin: 0 5px;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #f0f0f0;
+  flex: 1;
+  box-shadow: 0 0 3px -1px rgba(0, 0, 0, 0.3);
 }
