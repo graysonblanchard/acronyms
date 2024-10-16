@@ -3,8 +3,8 @@ import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 
 export function Board() {
-  const clue = "JFMAMJJASON";
-  const solutionLetter = "D";
+  const clue = "JFMAMJJ";
+  const solutionLetter = "A";
   //const solutionWord = "december";
   const solutionExplanation = "the months of the year";
 
