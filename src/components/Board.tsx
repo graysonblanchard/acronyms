@@ -2,9 +2,9 @@ import * as React from "react";
 import { Key, Keyboard } from "./Keyboard";
 
 export function Board() {
-  const [clue, setClue] = React.useState("AAADKTD");
-  const [solutionLetter, setSolutionLetter] = React.useState("A");
-  const [solutionWord, setSolutionWord] = React.useState("away");
+  //const [clue, setClue] = React.useState("AAADKTD");
+  //const [solutionLetter, setSolutionLetter] = React.useState("A");
+  //const [solutionWord, setSolutionWord] = React.useState("away");
 
   const [input, setInput] = React.useState("");
   const [showSubmit, setShowSubmit] = React.useState(false);
@@ -23,7 +23,7 @@ export function Board() {
     <div>
       <div className="header">ACRONYMS</div>
       <div className="board">
-        <span className="clue">{clue}</span>
+        <span className="clue">{'AAADKTD'}</span>
         <input value={input.toUpperCase()} readOnly />
         {showSubmit && (
           <div className="buttonBar">
