@@ -1,5 +1,8 @@
 import * as React from "react";
-import { Key, Keyboard } from "./Keyboard";
+import { Key } from "./Keyboard";
+
+import Keyboard from "react-simple-keyboard";
+import "react-simple-keyboard/build/css/index.css";
 
 export function Board() {
   //const [clue, setClue] = React.useState("AAADKTD");
@@ -23,7 +26,7 @@ export function Board() {
     <div>
       <div className="header">ACRONYMS</div>
       <div className="board">
-        <span className="clue">{'AAADKTD'}</span>
+        <span className="clue">{"AAADKTD"}</span>
         <input value={input.toUpperCase()} readOnly />
         {showSubmit && (
           <div className="buttonBar">
@@ -31,11 +34,24 @@ export function Board() {
           </div>
         )}
       </div>
-      <Keyboard
-        onInput={(value) => {
-          handleKeyPress(value);
-        }}
-      />
+      <div className="keyboard">
+        <Keyboard
+          onChange={(text) => {
+            setInput(text);
+          }}
+          maxLength={1}
+          display={{
+            "{bksp}": " ⌫ ",
+          }}
+          layout={{
+            default: [
+              "q w e r t y u i o p",
+              "a s d f g h j k l",
+              "z x c v b n m {bksp}",
+            ],
+          }}
+        />
+      </div>
     </div>
   );
 }
