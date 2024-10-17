@@ -144,6 +144,11 @@ export function Game() {
         onRequestClose={() => setShowModal(false)}
         contentLabel={modalType ?? undefined}
         shouldCloseOnOverlayClick={false}
+        style={{
+          content: {
+            inset: '30px',
+          }
+        }}
       >
         <ModalContent modalType={modalType} closeModal={() => { setShowModal(false); }}/>
       </Modal>
