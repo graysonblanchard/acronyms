@@ -2,6 +2,7 @@ import * as React from "react";
 import Countdown from "react-countdown";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
+import { CluesList } from "./clues";
 
 enum Result {
   Win = "win",
@@ -9,21 +10,22 @@ enum Result {
 }
 
 export function Game() {
-  const clue = "JFMAMJJ";
-  const solutionLetter = "A";
-  const solutionWord = "AUGUST";
-  const solutionExplanation = "the months of the year";
-  const solutionExplanationDescription = "The months of the year";
-
-  //const [clue, setClue] = React.useState("AAADKTD");
-  //const [solutionLetter, setSolutionLetter] = React.useState("A");
-  //const [solutionWord, setSolutionWord] = React.useState("away");
+  const clue = CluesList[0].clue;
+  const solutionLetter = CluesList[0].solutionLetter;
+  const solutionWord = CluesList[0].solutionWord;
+  const solutionExplanation = CluesList[0].solutionExplanation;
+  const solutionExplanationDescription = CluesList[0].solutionExplanationDescription;
 
   const [input, setInput] = React.useState<string>("");
   const [livesLeft, setLivesLeft] = React.useState<number>(3);
   const [guessedLetters, setGuessedLetters] = React.useState<string[]>([]);
   const [removedLetters, setRemovedLetters] = React.useState<string>("");
   const [showGameOverDisplay, setShowGameOverDisplay] = React.useState<boolean>(false);
+
+  // Use local storage
+  // React.useEffect(() => {
+
+  // }, []);
 
   const updateRemovedLetters = (letter: string) => {
     setRemovedLetters(

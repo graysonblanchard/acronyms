@@ -49,21 +49,20 @@ body {
 
 .board {
   position: relative;
-  font-size: 38px;
+  font-size: 8vw;
 }
 
 .clue {
-  letter-spacing: 12px;
+  letter-spacing: 2vw;
 }
 
 input {
-  width: fit-content;
   font-family: inherit;
   font-size: inherit;
   border: none;
   border-bottom: 2px solid #000;
   padding: 0;
-  max-width: 40px;
+  max-width: 8vw;
   text-align: center;
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 0;
