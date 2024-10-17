@@ -3,11 +3,9 @@ import Countdown from "react-countdown";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 import { CluesList } from "./clues";
-
-enum Result {
-  Win = "win",
-  Lose = "lose",
-}
+import { ModalTypes, Result } from "./enums";
+import Modal from 'react-modal';
+import { ModalContent } from "./ModalContent";
 
 export function Game() {
   const clue = CluesList[0].clue;
@@ -21,7 +19,15 @@ export function Game() {
   const [guessedLetters, setGuessedLetters] = React.useState<string[]>([]);
   const [removedLetters, setRemovedLetters] = React.useState<string>("");
   const [showGameOverDisplay, setShowGameOverDisplay] = React.useState<boolean>(false);
+  const [showModal, setShowModal] = React.useState<boolean>(false);
+  const [modalType, setModalType] = React.useState<ModalTypes | undefined>(undefined);
 
+  Modal.setAppElement('body');
+
+  // TO DO:
+  //
+  // Opening animation
+  //
   // Use local storage
   // React.useEffect(() => {
 
@@ -32,6 +38,11 @@ export function Game() {
       removedLetters + " " + letter.toUpperCase() + " " + letter.toLowerCase()
     );
   };
+
+  const openModal = (modalType: ModalTypes) => {
+    setShowModal(true);
+    setModalType(modalType);
+  }
 
   const gameOver = (result: Result) => {
     switch (result) {
@@ -96,7 +107,7 @@ export function Game() {
       );
     }
     return (
-      <div className="stars">
+      <div className={showGameOverDisplay ? 'stars-game-over' : 'stars'}>
         {stars.map((star, i) => {
           return <div style={{ display:'flex' }} key={"star-" + i}>{star}</div>;
         })}
@@ -124,7 +135,18 @@ export function Game() {
 
   return (
     <div>
-      <div className="header">ACRONYMS</div>
+      <div className="header">
+        {'ACRONYX'}
+        <div className="help" onClick={() => { openModal(ModalTypes.Help); }}>?</div>
+      </div>
+      <Modal
+        isOpen={showModal}
+        onRequestClose={() => setShowModal(false)}
+        contentLabel={modalType ?? undefined}
+        shouldCloseOnOverlayClick={false}
+      >
+        <ModalContent modalType={modalType} closeModal={() => { setShowModal(false); }}/>
+      </Modal>
       <div className="flex-container">
         <div className="board">
           <span className="clue">{clue}</span>

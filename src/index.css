@@ -24,6 +24,35 @@ body {
   border-bottom: 1px solid gray;
 }
 
+.header .help {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  right: 20px;
+  font-size: 14px;
+  padding: 2px 7px;
+  border: 1px solid gray;
+  color: gray;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* .modal {
+  position: relative;
+} */
+
+.modal-close {
+  padding: 7px;
+  border-radius: 50%;
+  background-color: inherit;
+  cursor: pointer;
+  color: gray;
+  width: fit-content;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
 .flex-container {
   display: flex;
   flex-direction: column;
@@ -45,6 +74,11 @@ body {
 .stars {
   display: flex;
   margin-bottom: 18px;
+}
+
+.stars-game-over {
+  display: flex;
+  margin-bottom: 0;
 }
 
 .board {
