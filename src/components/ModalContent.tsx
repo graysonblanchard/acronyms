@@ -6,19 +6,43 @@ export interface ModalProps {
   closeModal: () => void;
 }
 
+interface ModalData {
+  title: string;
+  body: React.ReactElement;
+}
+
 export function ModalContent(props: ModalProps) {
-  const title = () => {
+  const modalData: ModalData = {
+    title: "",
+    body: <></>,
+  }
+
     switch (props.modalType) {
       case ModalTypes.Help:
-        return "How to play:";
+        modalData.title = "How to play:";
+        modalData.body = (
+          <>
+            <div>Solve the acronym by determining the missing letter!</div>
+            <div>The acronym may be a reference to a common English phrase or expression, a famous name, a list, etc. </div>
+            <h4>Scoring</h4>
+            <div>You have only three guesses.</div>
+            <div>Each incorrect guess deducts a point from your score.</div>
+            <h4>Hints</h4>
+            <div>You have two hints available for each clue.</div>
+            <div>Each hint used deducts a point from your score.</div>
+            <br />
+            <div>Good luck!</div>
+          </>
+        )
+        break;
       default:
-        return "";
+        break;
     }
-  };
+  
 
   return (
     <div>
-      <h4>{title()}</h4>
+      <h4>{modalData.title}</h4>
       <div className="modal-close" onClick={props.closeModal}>
         <svg
           stroke="currentColor"
@@ -34,6 +58,7 @@ export function ModalContent(props: ModalProps) {
           <path d="M9.207 8.5l6.646 6.646-0.707 0.707-6.646-6.646-6.646 6.646-0.707-0.707 6.646-6.646-6.647-6.646 0.707-0.707 6.647 6.646 6.646-6.646 0.707 0.707-6.646 6.646z"></path>
         </svg>
       </div>
+      <div className="modal-body">{modalData.body}</div>
     </div>
   );
 }

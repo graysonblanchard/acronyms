@@ -53,6 +53,14 @@ body {
   right: 10px;
 }
 
+.modal-body h5 {
+  margin-bottom: -10px;
+}
+
+.modal-body div {
+  margin: 15px 0;
+}
+
 .flex-container {
   display: flex;
   flex-direction: column;
