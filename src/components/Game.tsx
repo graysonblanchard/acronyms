@@ -94,7 +94,7 @@ export function Game() {
       );
     }
     return (
-      <div style={{ display: 'flex' }}>
+      <div className="stars">
         {stars.map((star, i) => {
           return <div style={{ display:'flex' }} key={"star-" + i}>{star}</div>;
         })}
