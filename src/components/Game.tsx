@@ -92,7 +92,7 @@ export function Game() {
         gameOver();
       } else {
         setLivesLeft(livesLeft - 1);
-        //window.alert("Incorrect! Try again.");
+        window.alert("Incorrect! Not " + input.toUpperCase() + ". Try again.");
       }
     }
   };
@@ -108,11 +108,11 @@ export function Game() {
         <div className="flex-container-2">
           <div className="buttonBar">
             <button
-              className="submit"
+              className={"submit" + (input.length === 0 ? " disabled" : "")}
               onClick={makeGuess}
               disabled={input.length === 0}
             >
-              Submit
+              Guess
             </button>
           </div>
           <div>{getStars()}</div>
@@ -120,16 +120,22 @@ export function Game() {
         <div className="keyboard">
           <Keyboard
             inputName="input"
-            onChange={(text) => {
+            onChange={(text, e: any) => {
+              const letter = text.charAt(text.length - 1);
+
               console.log('text', text);
               console.log('guessedLetters', guessedLetters);
               console.log('removedLetters', removedLetters);
 
-              if(text === '' || !guessedLetters.includes(text.toUpperCase())) {
-                setInput(text);
+              if(text === '' || !guessedLetters.includes(letter.toUpperCase())) {
+                if(e?.target?.dataset.skbtn === "{bksp}") {
+                  setInput('');
+                }
+                else {
+                  setInput(letter);
+                }
               }
             }}
-            maxLength={1}
             display={{
               "{bksp}": " ⌫ ",
             }}

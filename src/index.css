@@ -85,7 +85,7 @@ input:focus {
   border: none;
 }
 
-.buttonBar .submit:disabled {
+.buttonBar .submit.disabled {
   font-family: inherit;
   cursor: default;
   outline: 1px solid #abaaaa;
@@ -93,9 +93,9 @@ input:focus {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.buttonBar .submit:disabled:focus,
-.buttonBar .submit:disabled:active,
-.buttonBar .submit:disabled:hover {
+.buttonBar .submit.disabled:focus,
+.buttonBar .submit.disabled:active,
+.buttonBar .submit.disabled:hover {
   font-family: inherit;
   cursor: default;
   outline: 1px solid #abaaaa;
