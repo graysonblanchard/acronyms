@@ -13,9 +13,13 @@ export function Game() {
   //const [solutionWord, setSolutionWord] = React.useState("away");
 
   const [input, setInput] = React.useState<string>("");
-  const [showSubmit, setShowSubmit] = React.useState<boolean>(false);
   const [livesLeft, setLivesLeft] = React.useState<number>(3);
   const [guessedLetters, setGuessedLetters] = React.useState<string[]>([]);
+  const [removedLetters, setRemovedLetters] = React.useState<string>("");
+
+  const updateRemovedLetters = (letter: string) => {
+    setRemovedLetters(removedLetters + ' ' + letter.toUpperCase() + ' ' + letter.toLowerCase());
+  }
 
   const gameOver = () => {
     window.alert(
@@ -25,6 +29,11 @@ export function Game() {
         solutionExplanation +
         "."
     );
+
+    setInput('');
+    setGuessedLetters([]);
+    setRemovedLetters('');
+    setLivesLeft(3);
   };
 
   const getStars = () => {
@@ -61,8 +70,8 @@ export function Game() {
     }
     return (
       <div>
-        {stars.map((star) => {
-          return <span>{star}</span>;
+        {stars.map((star, i) => {
+          return <span key={'star-' + i}>{star}</span>;
         })}
       </div>
     );
@@ -75,13 +84,15 @@ export function Game() {
       );
     } else {
       setGuessedLetters([...guessedLetters, input.toUpperCase()]);
+      updateRemovedLetters(input);
+      setInput('');
 
       if (livesLeft === 1) {
         setLivesLeft(livesLeft - 1);
         gameOver();
       } else {
         setLivesLeft(livesLeft - 1);
-        window.alert("Incorrect! Try again.");
+        //window.alert("Incorrect! Try again.");
       }
     }
   };
@@ -96,19 +107,27 @@ export function Game() {
         </div>
         <div className="flex-container-2">
           <div className="buttonBar">
-            {showSubmit && (
-              <button className="submit" onClick={makeGuess}>
-                Submit
-              </button>
-            )}
+            <button
+              className="submit"
+              onClick={makeGuess}
+              disabled={input.length === 0}
+            >
+              Submit
+            </button>
           </div>
           <div>{getStars()}</div>
         </div>
         <div className="keyboard">
           <Keyboard
+            inputName="input"
             onChange={(text) => {
-              setInput(text);
-              setShowSubmit(text.length > 0);
+              console.log('text', text);
+              console.log('guessedLetters', guessedLetters);
+              console.log('removedLetters', removedLetters);
+
+              if(text === '' || !guessedLetters.includes(text.toUpperCase())) {
+                setInput(text);
+              }
             }}
             maxLength={1}
             display={{
@@ -121,6 +140,12 @@ export function Game() {
                 "z x c v b n m {bksp}",
               ],
             }}
+            buttonTheme={removedLetters ? [
+              {
+                class: "removed",
+                buttons: removedLetters,
+              },
+            ] : undefined}
           />
         </div>
       </div>

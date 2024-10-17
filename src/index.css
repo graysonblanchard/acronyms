@@ -1,4 +1,7 @@
 body {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   margin: 0;
   font-family: "Montserrat", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
@@ -75,11 +78,18 @@ input:focus {
   cursor: pointer;
   outline: none;
   color: #fff;
-  font-weight: bold;
   background-color: #17866a;
-  border: 2px solid black;
+  outline: 1px solid black;
   border-radius: 50px;
   transition: all 0.3s;
+}
+
+.buttonBar .submit:disabled {
+  font-family: inherit;
+  cursor: default;
+  outline: 1px solid #abaaaa;
+  color: #abaaaa;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .buttonBar .submit:hover {
@@ -94,4 +104,9 @@ input:focus {
   width: 100%;
   max-width: 650px;
   text-transform: uppercase;
+}
+
+.simple-keyboard.hg-layout-default .removed {
+  background-color: #c4c4c4 !important;
+  pointer-events: none;
 }
