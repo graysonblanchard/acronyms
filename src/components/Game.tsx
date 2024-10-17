@@ -5,7 +5,7 @@ import "react-simple-keyboard/build/css/index.css";
 export function Game() {
   const clue = "JFMAMJJ";
   const solutionLetter = "A";
-  //const solutionWord = "december";
+  //const solutionWord = "august";
   const solutionExplanation = "the months of the year";
 
   //const [clue, setClue] = React.useState("AAADKTD");
