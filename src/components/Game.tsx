@@ -89,14 +89,13 @@ export function Game() {
       updatePlayerData(data);
 
       if (data.isGameOver) {
-        //gameOver(data.gameOverReason);
         setInput(solutionLetter.toUpperCase());
         setShowGameOverDisplay(true);
       }
     } else {
       localStorage.setItem('acronyx', JSON.stringify(InitialPlayerData));
     }
-  }, [gameOver, solutionLetter]);
+  }, [solutionLetter]);
 
   // Update local storage
   const updatePlayerData = (data: PlayerData) => {
@@ -218,13 +217,13 @@ export function Game() {
           <>
             <div className="flex-container-2">
               <div className="buttonBar">
-                <button
+                {/* <button
                   className={"hint" + (playerData.hintsLeft === 0 ? " disabled" : "")}
                   onClick={() => { updatePlayerData({...playerData, hintsLeft: playerData.hintsLeft - 1}); }}
                   disabled={playerData.hintsLeft === 0}
                 >
                   Hint
-                </button>
+                </button> */}
                 <button
                   className={"submit" + (input.length === 0 ? " disabled" : "")}
                   onClick={makeGuess}
@@ -233,7 +232,7 @@ export function Game() {
                   Guess
                 </button>
               </div>
-              <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + playerData.hintsLeft}</div>
+              {/* <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + playerData.hintsLeft}</div> */}
               <div>{getStars()}</div>
             </div>
             <div className="keyboard">
