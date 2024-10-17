@@ -22,7 +22,7 @@ export function ModalContent(props: ModalProps) {
         modalData.title = "How to play:";
         modalData.body = (
           <>
-            <div>Solve the acronym by determining the missing letter!</div>
+            <div>Solve the acronym by determining the missing letter.</div>
             <div>The acronym may be a reference to a common English phrase or expression, a famous name, a list, etc. </div>
             <h4>Scoring</h4>
             <div>You have only three guesses.</div>
@@ -30,8 +30,8 @@ export function ModalContent(props: ModalProps) {
             <h4>Hints</h4>
             <div>You have two hints available for each clue.</div>
             <div>Each hint used deducts a point from your score.</div>
-            <br />
-            <div>Good luck!</div>
+            {/* <br />
+            <div>Good luck!</div> */}
           </>
         )
         break;
