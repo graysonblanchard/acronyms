@@ -1,12 +1,19 @@
 import * as React from "react";
+import Countdown from "react-countdown";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
+
+enum Result {
+  Win = "win",
+  Lose = "lose",
+}
 
 export function Game() {
   const clue = "JFMAMJJ";
   const solutionLetter = "A";
-  //const solutionWord = "august";
+  const solutionWord = "AUGUST";
   const solutionExplanation = "the months of the year";
+  const solutionExplanationDescription = "The months of the year";
 
   //const [clue, setClue] = React.useState("AAADKTD");
   //const [solutionLetter, setSolutionLetter] = React.useState("A");
@@ -16,24 +23,42 @@ export function Game() {
   const [livesLeft, setLivesLeft] = React.useState<number>(3);
   const [guessedLetters, setGuessedLetters] = React.useState<string[]>([]);
   const [removedLetters, setRemovedLetters] = React.useState<string>("");
+  const [showGameOverDisplay, setShowGameOverDisplay] = React.useState<boolean>(false);
 
   const updateRemovedLetters = (letter: string) => {
-    setRemovedLetters(removedLetters + ' ' + letter.toUpperCase() + ' ' + letter.toLowerCase());
-  }
-
-  const gameOver = () => {
-    window.alert(
-      "Game over! The correct answer is " +
-        solutionLetter +
-        ". These letters represent " +
-        solutionExplanation +
-        "."
+    setRemovedLetters(
+      removedLetters + " " + letter.toUpperCase() + " " + letter.toLowerCase()
     );
+  };
 
-    setInput('');
-    setGuessedLetters([]);
-    setRemovedLetters('');
-    setLivesLeft(3);
+  const gameOver = (result: Result) => {
+    switch (result) {
+      case Result.Win:
+        window.alert(
+          "Correct! " +
+            input.toUpperCase() +
+            " for " +
+            solutionWord +
+            ". These letters represent " +
+            solutionExplanation +
+            "."
+        );
+        break;
+      case Result.Lose:
+        window.alert(
+          "Game over! The correct answer is " +
+            solutionLetter +
+            ". These letters represent " +
+            solutionExplanation +
+            "."
+        );
+        break;
+      default:
+        break;
+    }
+
+    setInput(solutionLetter.toUpperCase());
+    setShowGameOverDisplay(true);
   };
 
   const getStars = () => {
@@ -69,9 +94,9 @@ export function Game() {
       );
     }
     return (
-      <div>
+      <div style={{ display: 'flex' }}>
         {stars.map((star, i) => {
-          return <span key={'star-' + i}>{star}</span>;
+          return <div style={{ display:'flex' }} key={"star-" + i}>{star}</div>;
         })}
       </div>
     );
@@ -79,17 +104,15 @@ export function Game() {
 
   const makeGuess = () => {
     if (input.toUpperCase() === solutionLetter.toUpperCase()) {
-      window.alert(
-        "Correct! These letters represent " + solutionExplanation + "."
-      );
+      gameOver(Result.Win);
     } else {
       setGuessedLetters([...guessedLetters, input.toUpperCase()]);
       updateRemovedLetters(input);
-      setInput('');
+      setInput("");
 
       if (livesLeft === 1) {
         setLivesLeft(livesLeft - 1);
-        gameOver();
+        gameOver(Result.Lose);
       } else {
         setLivesLeft(livesLeft - 1);
         window.alert("Incorrect! Not " + input.toUpperCase() + ". Try again.");
@@ -104,56 +127,81 @@ export function Game() {
         <div className="board">
           <span className="clue">{clue}</span>
           <input value={input.toUpperCase()} readOnly />
+          {showGameOverDisplay &&
+            <span className="solution-description">{solutionExplanationDescription}</span>
+          }
         </div>
-        <div className="flex-container-2">
-          <div className="buttonBar">
-            <button
-              className={"submit" + (input.length === 0 ? " disabled" : "")}
-              onClick={makeGuess}
-              disabled={input.length === 0}
-            >
-              Guess
-            </button>
-          </div>
-          <div>{getStars()}</div>
-        </div>
-        <div className="keyboard">
-          <Keyboard
-            inputName="input"
-            onChange={(text, e: any) => {
-              const letter = text.charAt(text.length - 1);
+        {showGameOverDisplay
+          ? <>
+              <div className="game-over">
+                <div className="game-over-score"><span className="your-score">Your score:</span>{getStars()}</div>
+              </div>
+              <Countdown
+                date={new Date().setHours(24, 0, 0, 0)} 
+                renderer={({ formatted }) => {
+                  return <div className="countdown">Next clue in:<span className="time">{' ' + formatted.hours + ':' + formatted.minutes + ':' + formatted.seconds}</span></div>;
+                }} 
+              />
+            </>
+          : (
+          <>
+            <div className="flex-container-2">
+              <div className="buttonBar">
+                <button
+                  className={"submit" + (input.length === 0 ? " disabled" : "")}
+                  onClick={makeGuess}
+                  disabled={input.length === 0}
+                >
+                  Guess
+                </button>
+              </div>
+              <div>{getStars()}</div>
+            </div>
+            <div className="keyboard">
+              <Keyboard
+                inputName="input"
+                onChange={(text, e: any) => {
+                  const letter = text.charAt(text.length - 1);
 
-              console.log('text', text);
-              console.log('guessedLetters', guessedLetters);
-              console.log('removedLetters', removedLetters);
+                  console.log("text", text);
+                  console.log("guessedLetters", guessedLetters);
+                  console.log("removedLetters", removedLetters);
 
-              if(text === '' || !guessedLetters.includes(letter.toUpperCase())) {
-                if(e?.target?.dataset.skbtn === "{bksp}") {
-                  setInput('');
+                  if (
+                    text === "" ||
+                    !guessedLetters.includes(letter.toUpperCase())
+                  ) {
+                    if (e?.target?.dataset.skbtn === "{bksp}") {
+                      setInput("");
+                    } else {
+                      setInput(letter);
+                    }
+                  }
+                }}
+                display={{
+                  "{bksp}": " ⌫ ",
+                }}
+                layout={{
+                  default: [
+                    "q w e r t y u i o p",
+                    "a s d f g h j k l",
+                    "z x c v b n m {bksp}",
+                  ],
+                }}
+                buttonTheme={
+                  removedLetters
+                    ? [
+                        {
+                          class: "removed",
+                          buttons: removedLetters,
+                        },
+                      ]
+                    : undefined
                 }
-                else {
-                  setInput(letter);
-                }
-              }
-            }}
-            display={{
-              "{bksp}": " ⌫ ",
-            }}
-            layout={{
-              default: [
-                "q w e r t y u i o p",
-                "a s d f g h j k l",
-                "z x c v b n m {bksp}",
-              ],
-            }}
-            buttonTheme={removedLetters ? [
-              {
-                class: "removed",
-                buttons: removedLetters,
-              },
-            ] : undefined}
-          />
-        </div>
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
