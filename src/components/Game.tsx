@@ -7,6 +7,26 @@ import { ModalTypes, Result } from "./enums";
 import Modal from 'react-modal';
 import { ModalContent } from "./ModalContent";
 
+interface PlayerData {
+  isGameOver: boolean;
+  gameOverReason: Result;
+  score: number;
+  guessesLeft: number;
+  hintsLeft: number;
+  guessedLetters: string[];
+  removedLetters: string;
+}
+
+const InitialPlayerData: PlayerData = {
+  isGameOver: false,
+  gameOverReason: Result.None,
+  score: 0,
+  guessesLeft: 3,
+  hintsLeft: 2,
+  guessedLetters: [],
+  removedLetters: ""
+}
+
 export function Game() {
   const clue = CluesList[0].clue;
   const solutionLetter = CluesList[0].solutionLetter;
@@ -15,37 +35,20 @@ export function Game() {
   const solutionExplanationDescription = CluesList[0].solutionExplanationDescription;
 
   const [input, setInput] = React.useState<string>("");
-  const [livesLeft, setLivesLeft] = React.useState<number>(3);
-  const [guessedLetters, setGuessedLetters] = React.useState<string[]>([]);
-  const [removedLetters, setRemovedLetters] = React.useState<string>("");
   const [showGameOverDisplay, setShowGameOverDisplay] = React.useState<boolean>(false);
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [modalType, setModalType] = React.useState<ModalTypes | undefined>(undefined);
-  const [hintCount, setHintCount] = React.useState<number>(0);
+  const [playerData, setPlayerData] = React.useState<PlayerData>(InitialPlayerData);
+  // also create function to update player data as a whole
 
   Modal.setAppElement('body');
 
   // TO DO:
   //
-  // Opening animation
-  //
-  // Use local storage
-  // React.useEffect(() => {
+  // Opening animation?
+  // Game over animation?
 
-  // }, []);
-
-  const updateRemovedLetters = (letter: string) => {
-    setRemovedLetters(
-      removedLetters + " " + letter.toUpperCase() + " " + letter.toLowerCase()
-    );
-  };
-
-  const openModal = (modalType: ModalTypes) => {
-    setShowModal(true);
-    setModalType(modalType);
-  }
-
-  const gameOver = (result: Result) => {
+  const gameOver = React.useCallback((result: Result) => {
     switch (result) {
       case Result.Win:
         window.alert(
@@ -71,14 +74,49 @@ export function Game() {
         break;
     }
 
+    updatePlayerData({...playerData, isGameOver: true, gameOverReason: result });
     setInput(solutionLetter.toUpperCase());
     setShowGameOverDisplay(true);
+  }, [input, solutionExplanation, solutionLetter, solutionWord, playerData]);
+
+  // Get/init local storage
+  React.useEffect(() => {
+    let playerData = localStorage.getItem('acronyx');
+
+    if (playerData) {
+      const data = JSON.parse(playerData) as PlayerData;
+
+      updatePlayerData(data);
+
+      if (data.isGameOver) {
+        //gameOver(data.gameOverReason);
+        setInput(solutionLetter.toUpperCase());
+        setShowGameOverDisplay(true);
+      }
+    } else {
+      localStorage.setItem('acronyx', JSON.stringify(InitialPlayerData));
+    }
+  }, [gameOver, solutionLetter]);
+
+  // Update local storage
+  const updatePlayerData = (data: PlayerData) => {
+    setPlayerData(data);
+    localStorage.setItem('acronyx', JSON.stringify(data));
+  }
+
+  const updatedRemovedLetters = (letter: string): string => {
+    return playerData.removedLetters + " " + letter.toUpperCase() + " " + letter.toLowerCase();
   };
+
+  const openModal = (modalType: ModalTypes) => {
+    setShowModal(true);
+    setModalType(modalType);
+  }
 
   const getStars = () => {
     let stars = [];
 
-    for (let i = 1; i <= livesLeft; i++) {
+    for (let i = 1; i <= playerData.guessesLeft; i++) {
       stars.push(
         <svg
           key={i}
@@ -95,7 +133,7 @@ export function Game() {
       );
     }
 
-    for (let i = 1; i <= 3 - livesLeft; i++) {
+    for (let i = 1; i <= 3 - playerData.guessesLeft; i++) {
       stars.push(
         <svg
           viewBox="0 0 1024 1024"
@@ -120,15 +158,18 @@ export function Game() {
     if (input.toUpperCase() === solutionLetter.toUpperCase()) {
       gameOver(Result.Win);
     } else {
-      setGuessedLetters([...guessedLetters, input.toUpperCase()]);
-      updateRemovedLetters(input);
+      updatePlayerData({
+        ...playerData,
+        guessedLetters: [...playerData.guessedLetters, input.toUpperCase()],
+        removedLetters: updatedRemovedLetters(input),
+        guessesLeft: playerData.guessesLeft - 1
+      });
+
       setInput("");
 
-      if (livesLeft === 1) {
-        setLivesLeft(livesLeft - 1);
+      if (playerData.guessesLeft === 1) {
         gameOver(Result.Lose);
       } else {
-        setLivesLeft(livesLeft - 1);
         window.alert("Incorrect! Not " + input.toUpperCase() + ". Try again.");
       }
     }
@@ -178,9 +219,9 @@ export function Game() {
             <div className="flex-container-2">
               <div className="buttonBar">
                 <button
-                  className={"hint" + (hintCount === 2 ? " disabled" : "")}
-                  onClick={() => { setHintCount(hintCount + 1); }}
-                  disabled={hintCount === 2}
+                  className={"hint" + (playerData.hintsLeft === 0 ? " disabled" : "")}
+                  onClick={() => { updatePlayerData({...playerData, hintsLeft: playerData.hintsLeft - 1}); }}
+                  disabled={playerData.hintsLeft === 0}
                 >
                   Hint
                 </button>
@@ -192,7 +233,7 @@ export function Game() {
                   Guess
                 </button>
               </div>
-              <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + (2 - hintCount)}</div>
+              <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + playerData.hintsLeft}</div>
               <div>{getStars()}</div>
             </div>
             <div className="keyboard">
@@ -201,13 +242,9 @@ export function Game() {
                 onChange={(text, e: any) => {
                   const letter = text.charAt(text.length - 1);
 
-                  console.log("text", text);
-                  console.log("guessedLetters", guessedLetters);
-                  console.log("removedLetters", removedLetters);
-
                   if (
                     text === "" ||
-                    !guessedLetters.includes(letter.toUpperCase())
+                    !playerData.guessedLetters.includes(letter.toUpperCase())
                   ) {
                     if (e?.target?.dataset.skbtn === "{bksp}") {
                       setInput("");
@@ -227,11 +264,11 @@ export function Game() {
                   ],
                 }}
                 buttonTheme={
-                  removedLetters
+                  playerData.removedLetters
                     ? [
                         {
                           class: "removed",
-                          buttons: removedLetters,
+                          buttons: playerData.removedLetters,
                         },
                       ]
                     : undefined
