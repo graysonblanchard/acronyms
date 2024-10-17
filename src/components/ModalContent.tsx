@@ -28,10 +28,10 @@ export function ModalContent(props: ModalProps) {
             <div>You have only three guesses.</div>
             <div>Each incorrect guess deducts a point from your score.</div>
             <h4>Hints</h4>
-            <div>You have two hints available for each clue.</div>
+            <div>You have two hints available for each clue. The first hint </div>
             <div>Each hint used deducts a point from your score.</div>
-            {/* <br />
-            <div>Good luck!</div> */}
+            <br />
+            <div>Good luck!</div>
           </>
         )
         break;

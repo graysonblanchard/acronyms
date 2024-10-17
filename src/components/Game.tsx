@@ -21,6 +21,7 @@ export function Game() {
   const [showGameOverDisplay, setShowGameOverDisplay] = React.useState<boolean>(false);
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [modalType, setModalType] = React.useState<ModalTypes | undefined>(undefined);
+  const [hintCount, setHintCount] = React.useState<number>(0);
 
   Modal.setAppElement('body');
 
@@ -177,6 +178,13 @@ export function Game() {
             <div className="flex-container-2">
               <div className="buttonBar">
                 <button
+                  className={"hint" + (hintCount === 2 ? " disabled" : "")}
+                  onClick={() => { setHintCount(hintCount + 1); }}
+                  disabled={hintCount === 2}
+                >
+                  Hint
+                </button>
+                <button
                   className={"submit" + (input.length === 0 ? " disabled" : "")}
                   onClick={makeGuess}
                   disabled={input.length === 0}
@@ -184,6 +192,7 @@ export function Game() {
                   Guess
                 </button>
               </div>
+              <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + (2 - hintCount)}</div>
               <div>{getStars()}</div>
             </div>
             <div className="keyboard">

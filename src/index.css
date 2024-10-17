@@ -37,10 +37,6 @@ body {
   cursor: pointer;
 }
 
-/* .modal {
-  position: relative;
-} */
-
 .modal-close {
   padding: 7px;
   border-radius: 50%;
@@ -113,11 +109,12 @@ input {
 input:focus {
   outline: none;
 }
+
 .buttonBar {
   height: 40px;
 }
 
-.buttonBar .submit {
+.buttonBar button {
   font-family: inherit;
   padding: 7px 18px;
   font-size: 18px;
@@ -130,9 +127,10 @@ input:focus {
   border-radius: 50px;
   transition: all 0.3s;
   border: none;
+  width: 100px;
 }
 
-.buttonBar .submit.disabled {
+.buttonBar button.disabled {
   font-family: inherit;
   cursor: default;
   outline: 1px solid #abaaaa;
@@ -140,9 +138,9 @@ input:focus {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.buttonBar .submit.disabled:focus,
-.buttonBar .submit.disabled:active,
-.buttonBar .submit.disabled:hover {
+.buttonBar button.disabled:focus,
+.buttonBar button.disabled:active,
+.buttonBar button.disabled:hover {
   font-family: inherit;
   cursor: default;
   outline: 1px solid #abaaaa;
@@ -150,8 +148,17 @@ input:focus {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.buttonBar .submit:hover {
+.buttonBar button:hover {
   background-color: #136752;
+}
+
+.buttonBar .hint {
+  margin-right: 16px;
+  background-color: #000;
+}
+
+.buttonBar .hint:hover {
+  background-color: #000;
 }
 
 .keyboard {
