@@ -12,13 +12,20 @@ export function Game() {
   //const [solutionLetter, setSolutionLetter] = React.useState("A");
   //const [solutionWord, setSolutionWord] = React.useState("away");
 
-  const [input, setInput] = React.useState("");
-  const [showSubmit, setShowSubmit] = React.useState(false);
-  const [livesLeft, setLivesLeft] = React.useState(3);
+  const [input, setInput] = React.useState<string>("");
+  const [showSubmit, setShowSubmit] = React.useState<boolean>(false);
+  const [livesLeft, setLivesLeft] = React.useState<number>(3);
+  const [guessedLetters, setGuessedLetters] = React.useState<string[]>([]);
 
   const gameOver = () => {
-    window.alert("Game over!");
-  }
+    window.alert(
+      "Game over! The correct answer is " +
+        solutionLetter +
+        ". These letters represent " +
+        solutionExplanation +
+        "."
+    );
+  };
 
   const getStars = () => {
     let stars = [];
@@ -67,15 +74,11 @@ export function Game() {
         "Correct! These letters represent " + solutionExplanation + "."
       );
     } else {
+      setGuessedLetters([...guessedLetters, input.toUpperCase()]);
+
       if (livesLeft === 1) {
         setLivesLeft(livesLeft - 1);
-        window.alert(
-          "Incorrect! The correct answer is " +
-            solutionLetter +
-            ". These letters represent " +
-            solutionExplanation +
-            "."
-        );
+        gameOver();
       } else {
         setLivesLeft(livesLeft - 1);
         window.alert("Incorrect! Try again.");
