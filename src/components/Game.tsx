@@ -4,84 +4,117 @@ import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 import { CluesList } from "./clues";
 import { ModalTypes, Result } from "./enums";
-import Modal from 'react-modal';
+import Modal from "react-modal";
 import { ModalContent } from "./ModalContent";
 
 interface PlayerData {
   isGameOver: boolean;
   gameOverReason: Result;
-  score: number;
-  guessesLeft: number;
-  hintsLeft: number;
+  totalScore: number;
+  currentScore: number;
+  //hintsLeft: number;
   guessedLetters: string[];
   removedLetters: string;
+  lastPlayed: Date;
 }
 
 const InitialPlayerData: PlayerData = {
   isGameOver: false,
   gameOverReason: Result.None,
-  score: 0,
-  guessesLeft: 3,
-  hintsLeft: 2,
+  totalScore: 0,
+  currentScore: 3,
+  //hintsLeft: 2,
   guessedLetters: [],
-  removedLetters: ""
-}
+  removedLetters: "",
+  lastPlayed: new Date(),
+};
+
+export const GAME_TITLE = "ACRONYMS";
 
 export function Game() {
   const clue = CluesList[0].clue;
   const solutionLetter = CluesList[0].solutionLetter;
   const solutionWord = CluesList[0].solutionWord;
   const solutionExplanation = CluesList[0].solutionExplanation;
-  const solutionExplanationDescription = CluesList[0].solutionExplanationDescription;
+  const solutionExplanationDescription =
+    CluesList[0].solutionExplanationDescription;
+
+  Modal.setAppElement("body");
 
   const [input, setInput] = React.useState<string>("");
-  const [showGameOverDisplay, setShowGameOverDisplay] = React.useState<boolean>(false);
+  const [showGameOverDisplay, setShowGameOverDisplay] =
+    React.useState<boolean>(false);
   const [showModal, setShowModal] = React.useState<boolean>(false);
-  const [modalType, setModalType] = React.useState<ModalTypes | undefined>(undefined);
-  const [playerData, setPlayerData] = React.useState<PlayerData>(InitialPlayerData);
-  // also create function to update player data as a whole
-
-  Modal.setAppElement('body');
+  const [modalType, setModalType] = React.useState<ModalTypes | undefined>(
+    undefined
+  );
+  const [playerData, setPlayerData] =
+    React.useState<PlayerData>(InitialPlayerData);
 
   // TO DO:
   //
-  // Opening animation?
   // Game over animation?
 
-  const gameOver = React.useCallback((result: Result) => {
-    switch (result) {
-      case Result.Win:
-        window.alert(
-          "Correct! " +
-            input.toUpperCase() +
-            " for " +
-            solutionWord +
-            ". These letters represent " +
-            solutionExplanation +
-            "."
-        );
-        break;
-      case Result.Lose:
-        window.alert(
-          "Game over! The correct answer is " +
-            solutionLetter +
-            ". These letters represent " +
-            solutionExplanation +
-            "."
-        );
-        break;
-      default:
-        break;
-    }
+  const gameOver = React.useCallback(
+    (result: Result, data: PlayerData) => {
+      switch (result) {
+        case Result.Win:
+          window.alert(
+            "Correct! " +
+              input.toUpperCase() +
+              " for " +
+              solutionWord +
+              ". These letters represent " +
+              solutionExplanation +
+              "."
+          );
+          break;
+        case Result.Lose:
+          window.alert(
+            "Game over! The correct answer is " +
+              solutionLetter +
+              ". These letters represent " +
+              solutionExplanation +
+              "."
+          );
+          break;
+        default:
+          break;
+      }
 
-    updatePlayerData({...playerData, isGameOver: true, gameOverReason: result });
-    setInput(solutionLetter.toUpperCase());
-    setShowGameOverDisplay(true);
-  }, [input, solutionExplanation, solutionLetter, solutionWord, playerData]);
+      updatePlayerData({
+        ...data,
+        totalScore: data.totalScore + data.currentScore,
+        isGameOver: true,
+        gameOverReason: result,
+      });
+      setInput(solutionLetter.toUpperCase());
+      setShowGameOverDisplay(true);
+    },
+    [input, solutionExplanation, solutionLetter, solutionWord]
+  );
+
+  React.useEffect(() => {
+    console.log("test - calling useeffect");
+
+    const textContainer = document.getElementById("wave-container");
+
+    if (textContainer?.textContent || textContainer?.childNodes.length) {
+      console.log("test - textContainer has content");
+    } else {
+      clue.split("").forEach((char, index) => {
+        const span = document.createElement("span");
+        span.textContent = char;
+        span.classList.add("wave-text");
+        span.style.animationDelay = `${index * 50}ms`;
+        textContainer!.appendChild(span);
+      });
+    }
+  }, [clue]);
 
   // Get/init local storage
   React.useEffect(() => {
-    let playerData = localStorage.getItem('acronyx');
+    let playerData = localStorage.getItem(GAME_TITLE);
 
     if (playerData) {
       const data = JSON.parse(playerData) as PlayerData;
@@ -93,29 +126,37 @@ export function Game() {
         setShowGameOverDisplay(true);
       }
     } else {
-      localStorage.setItem('acronyx', JSON.stringify(InitialPlayerData));
+      localStorage.setItem(GAME_TITLE, JSON.stringify(InitialPlayerData));
     }
   }, [solutionLetter]);
 
   // Update local storage
   const updatePlayerData = (data: PlayerData) => {
-    setPlayerData(data);
-    localStorage.setItem('acronyx', JSON.stringify(data));
-  }
+    let updatedData = { ...data, lastPlayed: new Date() };
+
+    setPlayerData(updatedData);
+    localStorage.setItem(GAME_TITLE, JSON.stringify(updatedData));
+  };
 
   const updatedRemovedLetters = (letter: string): string => {
-    return playerData.removedLetters + " " + letter.toUpperCase() + " " + letter.toLowerCase();
+    return (
+      playerData.removedLetters +
+      " " +
+      letter.toUpperCase() +
+      " " +
+      letter.toLowerCase()
+    );
   };
 
   const openModal = (modalType: ModalTypes) => {
     setShowModal(true);
     setModalType(modalType);
-  }
+  };
 
   const getStars = () => {
     let stars = [];
 
-    for (let i = 1; i <= playerData.guessesLeft; i++) {
+    for (let i = 1; i <= playerData.currentScore; i++) {
       stars.push(
         <svg
           key={i}
@@ -132,7 +173,7 @@ export function Game() {
       );
     }
 
-    for (let i = 1; i <= 3 - playerData.guessesLeft; i++) {
+    for (let i = 1; i <= 3 - playerData.currentScore; i++) {
       stars.push(
         <svg
           viewBox="0 0 1024 1024"
@@ -145,9 +186,13 @@ export function Game() {
       );
     }
     return (
-      <div className={showGameOverDisplay ? 'stars-game-over' : 'stars'}>
+      <div className={showGameOverDisplay ? "stars-game-over" : "stars"}>
         {stars.map((star, i) => {
-          return <div style={{ display:'flex' }} key={"star-" + i}>{star}</div>;
+          return (
+            <div style={{ display: "flex" }} key={"star-" + i}>
+              {star}
+            </div>
+          );
         })}
       </div>
     );
@@ -155,30 +200,39 @@ export function Game() {
 
   const makeGuess = () => {
     if (input.toUpperCase() === solutionLetter.toUpperCase()) {
-      gameOver(Result.Win);
+      gameOver(Result.Win, playerData);
     } else {
-      updatePlayerData({
+      let updatedData: PlayerData = {
         ...playerData,
         guessedLetters: [...playerData.guessedLetters, input.toUpperCase()],
         removedLetters: updatedRemovedLetters(input),
-        guessesLeft: playerData.guessesLeft - 1
-      });
+        currentScore: playerData.currentScore - 1,
+      };
 
-      setInput("");
-
-      if (playerData.guessesLeft === 1) {
-        gameOver(Result.Lose);
+      if (playerData.currentScore === 1) {
+        gameOver(Result.Lose, updatedData);
       } else {
+        setInput("");
+        updatePlayerData(updatedData);
         window.alert("Incorrect! Not " + input.toUpperCase() + ". Try again.");
       }
     }
   };
 
+  console.log("test - rendering game");
+
   return (
     <div>
       <div className="header">
-        {'ACRONYX'}
-        <div className="help" onClick={() => { openModal(ModalTypes.Help); }}>?</div>
+        {GAME_TITLE}
+        <div
+          className="help"
+          onClick={() => {
+            openModal(ModalTypes.Help);
+          }}
+        >
+          ?
+        </div>
       </div>
       <Modal
         isOpen={showModal}
@@ -187,33 +241,55 @@ export function Game() {
         shouldCloseOnOverlayClick={false}
         style={{
           content: {
-            inset: '30px',
-          }
+            inset: "30px",
+          },
         }}
       >
-        <ModalContent modalType={modalType} closeModal={() => { setShowModal(false); }}/>
+        <ModalContent
+          modalType={modalType}
+          closeModal={() => {
+            setShowModal(false);
+          }}
+        />
       </Modal>
       <div className="flex-container">
         <div className="board">
-          <span className="clue">{clue}</span>
+          <span id="wave-container" className="clue"></span>
           <input value={input.toUpperCase()} readOnly />
-          {showGameOverDisplay &&
-            <span className="solution-description">{solutionExplanationDescription}</span>
-          }
+          {showGameOverDisplay && (
+            <span className="solution-description">
+              {solutionExplanationDescription}
+            </span>
+          )}
         </div>
-        {showGameOverDisplay
-          ? <>
-              <div className="game-over">
-                <div className="game-over-score"><span className="your-score">Your score:</span>{getStars()}</div>
+        {showGameOverDisplay ? (
+          <>
+            <div className="game-over">
+              <div className="game-over-score">
+                <span className="your-score">Your score:</span>
+                {getStars()}
               </div>
-              <Countdown
-                date={new Date().setHours(24, 0, 0, 0)} 
-                renderer={({ formatted }) => {
-                  return <div className="countdown">Next clue in:<span className="time">{' ' + formatted.hours + ':' + formatted.minutes + ':' + formatted.seconds}</span></div>;
-                }} 
-              />
-            </>
-          : (
+            </div>
+            <Countdown
+              date={new Date().setHours(24, 0, 0, 0)}
+              renderer={({ formatted }) => {
+                return (
+                  <div className="countdown">
+                    Next clue in:
+                    <span className="time">
+                      {" " +
+                        formatted.hours +
+                        ":" +
+                        formatted.minutes +
+                        ":" +
+                        formatted.seconds}
+                    </span>
+                  </div>
+                );
+              }}
+            />
+          </>
+        ) : (
           <>
             <div className="flex-container-2">
               <div className="buttonBar">
