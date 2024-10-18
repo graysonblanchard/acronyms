@@ -32,6 +32,10 @@ const InitialPlayerData: PlayerData = {
   lastPlayed: new Date(),
 };
 
+function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 const getTodaysClue = (): Clue => {
   const today = new Date();
 
@@ -51,7 +55,6 @@ export function Game() {
   const solutionLetter = ClueOfTheDay.solutionLetter;
   const solutionWord = ClueOfTheDay.solutionWord;
   const solutionExplanation = ClueOfTheDay.solutionExplanation;
-  const solutionExplanationDescription = ClueOfTheDay.solutionExplanationDescription;
 
   Modal.setAppElement("body");
 
@@ -180,8 +183,6 @@ export function Game() {
     }
   };
 
-  console.log("test - rendering game");
-
   return (
     <div>
       <div className="header">
@@ -219,7 +220,7 @@ export function Game() {
           <input value={input.toUpperCase()} readOnly />
           {showGameOverDisplay && (
             <span className="solution-description">
-              {solutionExplanationDescription}
+              {capitalizeFirstLetter(solutionExplanation)}
             </span>
           )}
         </div>
