@@ -1,17 +1,17 @@
 import * as React from "react";
-import { PlayerData } from "./Game";
+import { GameData } from "./Game";
 
 interface StarsProps {
-    playerData: PlayerData;
+    gameData: GameData;
     showGameOverDisplay: boolean;
 }
 
 export const Stars = (props: StarsProps) => {
-    const { playerData, showGameOverDisplay } = props;
+    const { gameData, showGameOverDisplay } = props;
     
     let stars = [];
 
-    for (let i = 1; i <= playerData.currentScore; i++) {
+    for (let i = 1; i <= gameData.currentScore; i++) {
       stars.push(
         <svg
           key={i}
@@ -28,7 +28,7 @@ export const Stars = (props: StarsProps) => {
       );
     }
 
-    for (let i = 1; i <= 3 - playerData.currentScore; i++) {
+    for (let i = 1; i <= 3 - gameData.currentScore; i++) {
       stars.push(
         <svg
           viewBox="0 0 1024 1024"

@@ -1,7 +1,7 @@
 import * as React from "react";
 import Countdown from "react-countdown";
 import "react-simple-keyboard/build/css/index.css";
-import { Clue, ClueError, CluesList } from "./clues";
+import { Clue, ClueError, CluesList } from "./CluesList";
 import { ModalTypes, Result } from "./enums";
 import Modal from "react-modal";
 import { ModalContent } from "./ModalContent";
@@ -10,26 +10,34 @@ import { CustomKeyboard } from "./CustomKeyboard";
 
 export const GAME_TITLE = "ACRONYMS";
 
-export interface PlayerData {
+export interface GameData {
+  gameDate: Date;
   isGameOver: boolean;
   gameOverReason: Result;
-  totalScore: number;
   currentScore: number;
-  //hintsLeft: number;
   guessedLetters: string[];
   removedLetters: string;
-  lastPlayed: Date;
+  //hintsLeft: number;
+}
+
+const InitialGameData: GameData = {
+  gameDate: new Date(new Date().setHours(0, 0, 0, 0)),
+  isGameOver: false,
+  gameOverReason: Result.None,
+  currentScore: 3,
+  guessedLetters: [],
+  removedLetters: "",
+  //hintsLeft: 2
+};
+
+export interface PlayerData {
+  games: GameData[];
+  totalScore: number;
 }
 
 const InitialPlayerData: PlayerData = {
-  isGameOver: false,
-  gameOverReason: Result.None,
+  games: [],
   totalScore: 0,
-  currentScore: 3,
-  //hintsLeft: 2,
-  guessedLetters: [],
-  removedLetters: "",
-  lastPlayed: new Date(),
 };
 
 function capitalizeFirstLetter(string: string) {
@@ -66,10 +74,11 @@ export function Game() {
     undefined
   );
   const [playerData, setPlayerData] =
-    React.useState<PlayerData>(InitialPlayerData);
+    React.useState<PlayerData>({...InitialPlayerData});
+  const [gameData, setGameData] = React.useState<GameData>({...InitialGameData});
 
   const gameOver = React.useCallback(
-    (result: Result, data: PlayerData) => {
+    (result: Result, data: GameData) => {
       switch (result) {
         case Result.Win:
           window.alert(
@@ -95,16 +104,14 @@ export function Game() {
           break;
       }
 
-      updatePlayerData({
-        ...data,
-        totalScore: data.totalScore + data.currentScore,
-        isGameOver: true,
-        gameOverReason: result,
-      });
+      const updatedGameData = {...data, isGameOver: true, gameOverReason: result};
+      const updatedPlayerData = {...playerData, totalScore: playerData.totalScore + data.currentScore};
+
+      updateLocalStorage(updatedPlayerData, updatedGameData);
       setInput(solutionLetter.toUpperCase());
       setShowGameOverDisplay(true);
     },
-    [input, solutionExplanation, solutionLetter, solutionWord]
+    [input, solutionExplanation, solutionLetter, solutionWord, playerData]
   );
 
   React.useEffect(() => {
@@ -123,14 +130,19 @@ export function Game() {
 
   // Get/initialize local storage
   React.useEffect(() => {
-    let playerData = localStorage.getItem(GAME_TITLE);
+    let localStorageData = localStorage.getItem(GAME_TITLE);
 
-    if (playerData) {
-      const data = JSON.parse(playerData) as PlayerData;
+    if (localStorageData) {
+      const data = JSON.parse(localStorageData) as PlayerData;
 
-      updatePlayerData(data);
+      const currentGame = data.games.find((game: GameData) => {
+        return game.gameDate ? new Date(game.gameDate).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) : false;
+      }) ?? {...InitialGameData};
 
-      if (data.isGameOver) {
+      setPlayerData(data);
+      setGameData(currentGame);
+
+      if (currentGame.isGameOver) {
         setInput(solutionLetter.toUpperCase());
         setShowGameOverDisplay(true);
       }
@@ -140,16 +152,27 @@ export function Game() {
   }, [solutionLetter]);
 
   // Update local storage
-  const updatePlayerData = (data: PlayerData) => {
-    let updatedData = { ...data, lastPlayed: new Date() };
+  const updateLocalStorage = (updatedPlayerData: PlayerData, updatedGameData: GameData) => {
+    let gamesPlayed: GameData[] = [...updatedPlayerData.games];
+    
+    if(updatedPlayerData.games.length === 0 || (updatedPlayerData.games.length > 0 && updatedPlayerData.games[updatedPlayerData.games.length - 1].gameDate !== updatedGameData.gameDate)) {      
+      gamesPlayed.push(updatedGameData);
+    }
+    else if(updatedPlayerData.games[updatedPlayerData.games.length - 1].gameDate === updatedGameData.gameDate) {
+      gamesPlayed[updatedPlayerData.games.length - 1] = updatedGameData;
+    }
+    
+    let updatedLocalStorageData = { ...updatedPlayerData, games: gamesPlayed };
 
-    setPlayerData(updatedData);
-    localStorage.setItem(GAME_TITLE, JSON.stringify(updatedData));
+    setGameData(updatedGameData);
+    setPlayerData(updatedLocalStorageData);
+
+    localStorage.setItem(GAME_TITLE, JSON.stringify(updatedLocalStorageData));
   };
 
   const updatedRemovedLetters = (letter: string): string => {
     return (
-      playerData.removedLetters +
+      gameData.removedLetters +
       " " +
       letter.toUpperCase() +
       " " +
@@ -164,20 +187,20 @@ export function Game() {
 
   const makeGuess = () => {
     if (input.toUpperCase() === solutionLetter.toUpperCase()) {
-      gameOver(Result.Win, playerData);
+      gameOver(Result.Win, gameData);
     } else {
-      let updatedData: PlayerData = {
-        ...playerData,
-        guessedLetters: [...playerData.guessedLetters, input.toUpperCase()],
+      let updatedData: GameData = {
+        ...gameData,
+        guessedLetters: [...gameData.guessedLetters, input.toUpperCase()],
         removedLetters: updatedRemovedLetters(input),
-        currentScore: playerData.currentScore - 1,
+        currentScore: gameData.currentScore - 1,
       };
 
-      if (playerData.currentScore === 1) {
+      if (gameData.currentScore === 1) {
         gameOver(Result.Lose, updatedData);
       } else {
         setInput("");
-        updatePlayerData(updatedData);
+        updateLocalStorage(playerData, updatedData);
         window.alert("Incorrect! Not " + input.toUpperCase() + ". Try again.");
       }
     }
@@ -229,7 +252,7 @@ export function Game() {
             <div className="game-over">
               <div className="game-over-score">
                 <span className="your-score">Your score:</span>
-                <Stars playerData={playerData} showGameOverDisplay={showGameOverDisplay} />
+                <Stars gameData={gameData} showGameOverDisplay={showGameOverDisplay} />
               </div>
             </div>
             <Countdown
@@ -271,10 +294,10 @@ export function Game() {
                 </button>
               </div>
               {/* <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + playerData.hintsLeft}</div> */}
-              <div><Stars playerData={playerData} showGameOverDisplay={showGameOverDisplay} /></div>
+              <div><Stars gameData={gameData} showGameOverDisplay={showGameOverDisplay} /></div>
             </div>
             <div className="keyboard">
-              <CustomKeyboard playerData={playerData} setInput={setInput} />
+              <CustomKeyboard gameData={gameData} setInput={setInput} />
             </div>
           </>
         )}

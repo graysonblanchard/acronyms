@@ -1,13 +1,14 @@
 import * as React from "react";
 import Keyboard from "react-simple-keyboard";
+import { GameData } from "./Game";
 
 interface CustomKeyboardProps {
-  playerData: any;
+  gameData: GameData;
   setInput: any;
 }
 
 export const CustomKeyboard = (props: CustomKeyboardProps) => {
-  const { playerData, setInput } = props;
+  const { gameData, setInput } = props;
 
   return (
     <Keyboard
@@ -17,7 +18,7 @@ export const CustomKeyboard = (props: CustomKeyboardProps) => {
 
         if (
           text === "" ||
-          !playerData.guessedLetters.includes(letter.toUpperCase())
+          !gameData.guessedLetters.includes(letter.toUpperCase())
         ) {
           if (e?.target?.dataset.skbtn === "{bksp}") {
             setInput("");
@@ -37,11 +38,11 @@ export const CustomKeyboard = (props: CustomKeyboardProps) => {
         ],
       }}
       buttonTheme={
-        playerData.removedLetters
+        gameData.removedLetters
           ? [
               {
                 class: "removed",
-                buttons: playerData.removedLetters,
+                buttons: gameData.removedLetters,
               },
             ]
           : undefined
