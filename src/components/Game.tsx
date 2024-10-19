@@ -8,7 +8,7 @@ import { ModalContent } from "./ModalContent";
 import { Stars } from "./Stars";
 import { CustomKeyboard } from "./CustomKeyboard";
 
-export const GAME_TITLE = "ACRONYMS";
+export const GAME_TITLE = "ACRONYX";
 
 export interface GameData {
   gameDate: Date;
