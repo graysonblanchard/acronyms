@@ -85,20 +85,20 @@ export function Game() {
       switch (result) {
         case Result.Win:
           window.alert(
-            "Correct! " +
+            "Correct!\n" +
               input.toUpperCase() +
               " for " +
               solutionWord +
-              ". These letters represent " +
+              ".\nThese letters represent " +
               solutionExplanation +
               "."
           );
           break;
         case Result.Lose:
           window.alert(
-            "Game over! The correct answer is " +
+            "Game over!\nThe correct answer is " +
               solutionLetter +
-              ". These letters represent " +
+              ".\nThese letters represent " +
               solutionExplanation +
               "."
           );
@@ -125,7 +125,7 @@ export function Game() {
   );
 
   const useHint = () => {
-    window.alert("Hint: " + ClueOfTheDay.hint);
+    window.alert("Hint:\n" + ClueOfTheDay.hint);
 
     if(!gameData.hintUsed) {
       const updatedData: GameData = {
@@ -238,7 +238,7 @@ export function Game() {
       } else {
         setInput("");
         updateLocalStorage(playerData, updatedData);
-        window.alert("Incorrect! Not " + input.toUpperCase() + ". Try again.");
+        window.alert("Incorrect!\nNot " + input.toUpperCase() + ".\nTry again.");
       }
     }
   };
