@@ -65,7 +65,7 @@ body {
   left: 20px;
   font-size: 14px;
   padding: 2px 7px;
-  cursor: pointer;
+  /* cursor: pointer; */
   display: flex;
   align-items: center;
 }

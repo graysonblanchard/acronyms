@@ -24,7 +24,7 @@ export function ModalContent(props: ModalProps) {
       modalData.body = (
         <>
           <div>Solve the abbreviation by entering the missing letter.</div>
-          <div>The abbreviation may be an acronym, a reference to a common English phrase or expression, a famous name, a list, etc. </div>
+          <div>It may be an acronym, a reference to a common English phrase or expression, a famous name, a list, etc. </div>
           <h4>Example</h4>
           <div><img src={ExampleImg} alt='Example Clue' width={'200px'}/></div>
           <div>In this example, the letters stand for the colors of the rainbow. The solution is V which stands for VIOLET.</div>
