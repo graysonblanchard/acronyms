@@ -248,10 +248,10 @@ export function Game() {
       <div className="header">
         <div
           className="streak"
-          onClick={(e) => {
-            e.preventDefault();
-            //window.alert("streak");
-          }}
+          // onClick={(e) => {
+          //   e.preventDefault();
+          //   //window.alert("streak");
+          // }}
         >
           <svg
             key={"streak"}
