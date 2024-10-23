@@ -4,6 +4,7 @@ export interface Clue {
     solutionLetter: string;
     solutionWord: string;
     solutionExplanation: string;
+    hint: string;
 }
 
 export const ClueError: Clue = {
@@ -11,7 +12,8 @@ export const ClueError: Clue = {
     clueDate: new Date("01/01/2024"),
     solutionLetter: "E",
     solutionWord: "ERROR",
-    solutionExplanation: "ERROR"
+    solutionExplanation: "ERROR",
+    hint: "ERROR"
 }
 
 export const CluesList: Clue[] = [
@@ -20,42 +22,48 @@ export const CluesList: Clue[] = [
         clueDate: new Date("10/18/2024"),
         solutionLetter: "D",
         solutionWord: "DECEMBER",
-        solutionExplanation: "the months of the year"
+        solutionExplanation: "the months of the year",
+        hint: ''
     },
     {
         clue: "DJABBI",
         clueDate: new Date("10/19/2024"),
         solutionLetter: "C",
         solutionWord: "COVER",
-        solutionExplanation: "\"Don't judge a book by its cover\""
+        solutionExplanation: "\"Don't judge a book by its cover\"",
+        hint: ''
     },
     {
         clue: "APIWAT",
         clueDate: new Date("10/20/2024"),
         solutionLetter: "W",
         solutionWord: "WORDS",
-        solutionExplanation: "\"A picture is worth a thousand words\""
+        solutionExplanation: "\"A picture is worth a thousand words\"",
+        hint: ''
     },
     {
         clue: "WTAWTA",
         clueDate: new Date("10/21/2024"),
         solutionLetter: "W",
         solutionWord: "WAY",
-        solutionExplanation: "\"Where there's a will, there's a way\""
+        solutionExplanation: "\"Where there's a will, there's a way\"",
+        hint: ''
     }, 
     {
         clue: "ACIOASAIW",
         clueDate: new Date("10/22/2024"),
         solutionLetter: "L",
         solutionWord: "LINK",
-        solutionExplanation: "\"A chain is only as strong as its weakest link\""
+        solutionExplanation: "\"A chain is only as strong as its weakest link\"",
+        hint: 'Teamwork'
     },
     {
         clue: "DCYCBT",
         clueDate: new Date("10/23/2024"),
         solutionLetter: "H",
         solutionWord: "HATCH",
-        solutionExplanation: "\"Don't count your chickens before they hatch\""
+        solutionExplanation: "\"Don't count your chickens before they hatch\"",
+        hint: 'Eggs'
     } 
 ];
 

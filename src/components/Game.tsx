@@ -17,7 +17,7 @@ export interface GameData {
   currentScore: number;
   guessedLetters: string[];
   removedLetters: string;
-  //hintsLeft: number;
+  hintUsed: boolean;
 }
 
 const InitialGameData: GameData = {
@@ -27,7 +27,7 @@ const InitialGameData: GameData = {
   currentScore: 3,
   guessedLetters: [],
   removedLetters: "",
-  //hintsLeft: 2
+  hintUsed: false
 };
 
 export interface PlayerData {
@@ -73,9 +73,12 @@ export function Game() {
   const [modalType, setModalType] = React.useState<ModalTypes | undefined>(
     undefined
   );
-  const [playerData, setPlayerData] =
-    React.useState<PlayerData>({...InitialPlayerData});
-  const [gameData, setGameData] = React.useState<GameData>({...InitialGameData});
+  const [playerData, setPlayerData] = React.useState<PlayerData>({
+    ...InitialPlayerData,
+  });
+  const [gameData, setGameData] = React.useState<GameData>({
+    ...InitialGameData,
+  });
 
   const gameOver = React.useCallback(
     (result: Result, data: GameData) => {
@@ -104,8 +107,15 @@ export function Game() {
           break;
       }
 
-      const updatedGameData = {...data, isGameOver: true, gameOverReason: result};
-      const updatedPlayerData = {...playerData, totalScore: playerData.totalScore + data.currentScore};
+      const updatedGameData = {
+        ...data,
+        isGameOver: true,
+        gameOverReason: result,
+      };
+      const updatedPlayerData = {
+        ...playerData,
+        totalScore: playerData.totalScore + data.currentScore,
+      };
 
       updateLocalStorage(updatedPlayerData, updatedGameData);
       setInput(solutionLetter.toUpperCase());
@@ -113,6 +123,20 @@ export function Game() {
     },
     [input, solutionExplanation, solutionLetter, solutionWord, playerData]
   );
+
+  const useHint = () => {
+    window.alert("Hint: " + ClueOfTheDay.hint);
+
+    if(!gameData.hintUsed) {
+      const updatedData: GameData = {
+        ...gameData,
+        hintUsed: true,
+        currentScore: gameData.currentScore - 1,
+      };
+
+      updateLocalStorage(playerData, updatedData);
+    }
+  };
 
   React.useEffect(() => {
     const textContainer = document.getElementById("wave-container");
@@ -136,8 +160,11 @@ export function Game() {
       const data = JSON.parse(localStorageData) as PlayerData;
 
       const currentGame = data.games.find((game: GameData) => {
-        return game.gameDate ? new Date(game.gameDate).setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) : false;
-      }) ?? {...InitialGameData};
+        return game.gameDate
+          ? new Date(game.gameDate).setHours(0, 0, 0, 0) ===
+              new Date().setHours(0, 0, 0, 0)
+          : false;
+      }) ?? { ...InitialGameData };
 
       setPlayerData(data);
       setGameData(currentGame);
@@ -152,16 +179,26 @@ export function Game() {
   }, [solutionLetter]);
 
   // Update local storage
-  const updateLocalStorage = (updatedPlayerData: PlayerData, updatedGameData: GameData) => {
+  const updateLocalStorage = (
+    updatedPlayerData: PlayerData,
+    updatedGameData: GameData
+  ) => {
     let gamesPlayed: GameData[] = [...updatedPlayerData.games];
-    
-    if(updatedPlayerData.games.length === 0 || (updatedPlayerData.games.length > 0 && updatedPlayerData.games[updatedPlayerData.games.length - 1].gameDate !== updatedGameData.gameDate)) {      
+
+    if (
+      updatedPlayerData.games.length === 0 ||
+      (updatedPlayerData.games.length > 0 &&
+        updatedPlayerData.games[updatedPlayerData.games.length - 1].gameDate !==
+          updatedGameData.gameDate)
+    ) {
       gamesPlayed.push(updatedGameData);
-    }
-    else if(updatedPlayerData.games[updatedPlayerData.games.length - 1].gameDate === updatedGameData.gameDate) {
+    } else if (
+      updatedPlayerData.games[updatedPlayerData.games.length - 1].gameDate ===
+      updatedGameData.gameDate
+    ) {
       gamesPlayed[updatedPlayerData.games.length - 1] = updatedGameData;
     }
-    
+
     let updatedLocalStorageData = { ...updatedPlayerData, games: gamesPlayed };
 
     setGameData(updatedGameData);
@@ -193,7 +230,7 @@ export function Game() {
         ...gameData,
         guessedLetters: [...gameData.guessedLetters, input.toUpperCase()],
         removedLetters: updatedRemovedLetters(input),
-        currentScore: gameData.currentScore - 1,
+        currentScore: gameData.currentScore > 0 ? gameData.currentScore - 1 : 0,
       };
 
       if (gameData.currentScore === 1) {
@@ -209,6 +246,26 @@ export function Game() {
   return (
     <div>
       <div className="header">
+        <div
+          className="streak"
+          onClick={() => {
+            window.alert("streak");
+          }}
+        >
+          <svg
+            key={"streak"}
+            viewBox="0 0 1024 1024"
+            fill="currentColor"
+            height="1.5em"
+            width="1.5em"
+          >
+            <path
+              fill="gold"
+              d="M908.1 353.1l-253.9-36.9L540.7 86.1c-3.1-6.3-8.2-11.4-14.5-14.5-15.8-7.8-35-1.3-42.9 14.5L369.8 316.2l-253.9 36.9c-7 1-13.4 4.3-18.3 9.3a32.05 32.05 0 00.6 45.3l183.7 179.1-43.4 252.9a31.95 31.95 0 0046.4 33.7L512 754l227.1 119.4c6.2 3.3 13.4 4.4 20.3 3.2 17.4-3 29.1-19.5 26.1-36.9l-43.4-252.9 183.7-179.1c5-4.9 8.3-11.3 9.3-18.3 2.7-17.5-9.5-33.7-27-36.3z"
+            />
+          </svg>
+          <div className="total-score">{playerData.totalScore ?? 0}</div>
+        </div>
         {GAME_TITLE}
         <div
           className="help"
@@ -252,7 +309,10 @@ export function Game() {
             <div className="game-over">
               <div className="game-over-score">
                 <span className="your-score">Your score:</span>
-                <Stars gameData={gameData} showGameOverDisplay={showGameOverDisplay} />
+                <Stars
+                  gameData={gameData}
+                  showGameOverDisplay={showGameOverDisplay}
+                />
               </div>
             </div>
             <Countdown
@@ -278,13 +338,13 @@ export function Game() {
           <>
             <div className="flex-container-2">
               <div className="buttonBar">
-                {/* <button
-                  className={"hint" + (playerData.hintsLeft === 0 ? " disabled" : "")}
-                  onClick={() => { updatePlayerData({...playerData, hintsLeft: playerData.hintsLeft - 1}); }}
-                  disabled={playerData.hintsLeft === 0}
+                <button
+                  className={"hint"}// + (hintUsed ? " disabled" : "")}
+                  onClick={useHint}
+                  //disabled={hintUsed}
                 >
                   Hint
-                </button> */}
+                </button>
                 <button
                   className={"submit" + (input.length === 0 ? " disabled" : "")}
                   onClick={makeGuess}
@@ -294,7 +354,12 @@ export function Game() {
                 </button>
               </div>
               {/* <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + playerData.hintsLeft}</div> */}
-              <div><Stars gameData={gameData} showGameOverDisplay={showGameOverDisplay} /></div>
+              <div>
+                <Stars
+                  gameData={gameData}
+                  showGameOverDisplay={showGameOverDisplay}
+                />
+              </div>
             </div>
             <div className="keyboard">
               <CustomKeyboard gameData={gameData} setInput={setInput} />

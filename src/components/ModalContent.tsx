@@ -23,18 +23,18 @@ export function ModalContent(props: ModalProps) {
       modalData.title = "How to play:";
       modalData.body = (
         <>
-          <div>Solve the acronym by entering the missing letter.</div>
-          <div>The acronym may be a reference to a common English phrase or expression, a famous name, a list, etc. </div>
+          <div>Solve the abbreviation by entering the missing letter.</div>
+          <div>The abbreviation may be an acronym, a reference to a common English phrase or expression, a famous name, a list, etc. </div>
           <h4>Example</h4>
           <div><img src={ExampleImg} alt='Example Clue' width={'200px'}/></div>
           <div>In this example, the letters stand for the colors of the rainbow. The solution is V which stands for VIOLET.</div>
           <h4>Scoring</h4>
           <div>You have only three guesses.</div>
           <div>Each incorrect guess deducts a point from your score.</div>
+          <h4>Hints</h4>
+          <div>You have one hint available for each clue.</div>
+          <div>Using a hint deducts a point from your score.</div>
           <div>Good luck!</div>
-          {/* <h4>Hints</h4>
-          <div>You have two hints available for each clue.</div>
-          <div>Each hint used deducts a point from your score.</div> */}
         </>
       )
       break;
