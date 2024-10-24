@@ -64,6 +64,14 @@ export const CluesList: Clue[] = [
         solutionWord: "HATCH",
         solutionExplanation: "\"Don't count your chickens before they hatch\"",
         hint: 'Eggs'
+    }, 
+    {
+        clue: "WDKYMY",
+        clueDate: new Date("10/24/2024"),
+        solutionLetter: "S",
+        solutionWord: "STRONGER",
+        solutionExplanation: "\"What doesn't kill you makes you stronger\"",
+        hint: 'Motivation'
     } 
 ];
 
