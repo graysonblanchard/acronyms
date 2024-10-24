@@ -64,8 +64,12 @@ export function Game() {
   //const solutionWord = ClueOfTheDay.solutionWord;
   const solutionExplanation = ClueOfTheDay.solutionExplanation;
 
-  Modal.setAppElement("body");
+  const guessAnimationDelay: number = (ClueOfTheDay.clue.split("").length - 1) * 50 + 1500;
 
+  console.log('guessAnimationDelay', guessAnimationDelay);
+
+  Modal.setAppElement("body");
+  
   const [input, setInput] = React.useState<string>("");
   const [guessStatus, setGuessStatus] = React.useState<GuessStatus>(
     GuessStatus.None
@@ -133,18 +137,38 @@ export function Game() {
   };
 
   React.useEffect(() => {
-    const textContainer = document.getElementById("wave-container");
+    const textContainer = document.getElementById("animation-container");
 
-    if (!textContainer?.textContent && !textContainer?.childNodes.length) {
-      clue.split("").forEach((char, index) => {
-        const span = document.createElement("span");
-        span.textContent = char;
-        span.classList.add("wave-text");
-        span.style.animationDelay = `${index * 50}ms`;
-        textContainer!.appendChild(span);
-      });
+    if(textContainer) {
+      if (!textContainer?.textContent && !textContainer?.childNodes.length) {
+        clue.split("").forEach((char, index) => {
+          const span = document.createElement("span");
+          span.textContent = char;
+          span.classList.add("wave-text");
+          span.style.animationDelay = `${index * 50}ms`;
+          textContainer!.appendChild(span);
+        });
+      }
     }
   }, [clue]);
+
+  const triggerGuessAnimation = () => {
+    const textContainer = document.getElementById("animation-container");
+
+    if(textContainer) {
+      if (textContainer?.textContent && textContainer?.childNodes.length) {
+        textContainer.innerHTML = "";
+
+        clue.split("").forEach((char, index) => {
+          const span = document.createElement("span");
+          span.textContent = char;
+          span.classList.add("enlarge-text");
+          span.style.animationDelay = `${index * 50}ms`;
+          textContainer!.appendChild(span);
+        });
+      }
+    }
+  }
 
   // Get/initialize local storage
   React.useEffect(() => {
@@ -221,27 +245,31 @@ export function Game() {
   };
 
   const makeGuess = () => {
-    if (input.toUpperCase() === solutionLetter.toUpperCase()) {
-      updateGuessStatus(GuessStatus.Correct, gameData.currentScore);
-      gameOver(Result.Win, gameData);
-    } else {
-      const updatedCurrentScore = gameData.currentScore > 0 ? gameData.currentScore - 1 : 0;
+    triggerGuessAnimation();
 
-      let updatedData: GameData = {
-        ...gameData,
-        guessedLetters: [...gameData.guessedLetters, input.toUpperCase()],
-        removedLetters: updatedRemovedLetters(input),
-        currentScore: updatedCurrentScore,
-      };
-
-      updateGuessStatus(GuessStatus.Incorrect, updatedCurrentScore);
-
-      if (gameData.currentScore === 1) {
-        gameOver(Result.Lose, updatedData);
+    setTimeout(() => {
+      if (input.toUpperCase() === solutionLetter.toUpperCase()) {
+        updateGuessStatus(GuessStatus.Correct, gameData.currentScore);
+        gameOver(Result.Win, gameData);
       } else {
-        updateLocalStorage(playerData, updatedData);
+        const updatedCurrentScore = gameData.currentScore > 0 ? gameData.currentScore - 1 : 0;
+  
+        let updatedData: GameData = {
+          ...gameData,
+          guessedLetters: [...gameData.guessedLetters, input.toUpperCase()],
+          removedLetters: updatedRemovedLetters(input),
+          currentScore: updatedCurrentScore,
+        };
+  
+        updateGuessStatus(GuessStatus.Incorrect, updatedCurrentScore);
+  
+        if (gameData.currentScore === 1) {
+          gameOver(Result.Lose, updatedData);
+        } else {
+          updateLocalStorage(playerData, updatedData);
+        }
       }
-    }
+    }, guessAnimationDelay);
   };
 
   return (
@@ -292,7 +320,7 @@ export function Game() {
       </Modal>
       <div className="flex-container">
         <div className="board">
-          <span id="wave-container" className="clue"></span>
+          <span id="animation-container" className="clue"></span>
           <input className={guessStatus} value={input.toUpperCase()} readOnly />
           {showGameOverDisplay && (
             <span className="solution-description">

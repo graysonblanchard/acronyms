@@ -8,9 +8,23 @@
   }
 }
 
+@keyframes enlarge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+}
+
 .wave-text {
   display: inline-block;
   animation: wave .5s ease-in-out;
+}
+
+.enlarge-text {
+  display: inline-block;
+  animation: enlarge 1s ease-in-out;
 }
 
 /* App CSS */
@@ -141,8 +155,9 @@ body {
   font-size: 8vw;
 }
 
-.clue {
-  letter-spacing: 2vw;
+.clue span {
+  text-align: center;
+  min-width: 35px;
 }
 
 .board input {
