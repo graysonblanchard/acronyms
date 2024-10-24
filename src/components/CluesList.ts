@@ -8,13 +8,21 @@ export interface Clue {
 }
 
 export const ClueError: Clue = {
-    clue: "ERROR",
+    clue: "WDKYMY",
     clueDate: new Date("01/01/2024"),
-    solutionLetter: "E",
-    solutionWord: "ERROR",
-    solutionExplanation: "ERROR",
-    hint: "ERROR"
+    solutionLetter: "S",
+    solutionWord: "STRONGER",
+    solutionExplanation: "\"What doesn't kill you makes you stronger\"",
+    hint: 'Motivation'
 }
+// {
+//     clue: "ERROR",
+//     clueDate: new Date("01/01/2024"),
+//     solutionLetter: "E",
+//     solutionWord: "ERROR",
+//     solutionExplanation: "ERROR",
+//     hint: "ERROR"
+// }
 
 export const CluesList: Clue[] = [
     {
