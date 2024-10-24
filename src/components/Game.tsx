@@ -2,7 +2,7 @@ import * as React from "react";
 import Countdown from "react-countdown";
 import "react-simple-keyboard/build/css/index.css";
 import { Clue, ClueError, CluesList } from "./CluesList";
-import { ModalTypes, Result } from "./enums";
+import { GuessStatus, ModalTypes, Result } from "./enums";
 import Modal from "react-modal";
 import { ModalContent } from "./ModalContent";
 import { Stars } from "./Stars";
@@ -27,7 +27,7 @@ const InitialGameData: GameData = {
   currentScore: 3,
   guessedLetters: [],
   removedLetters: "",
-  hintUsed: false
+  hintUsed: false,
 };
 
 export interface PlayerData {
@@ -61,12 +61,16 @@ export function Game() {
 
   const clue = ClueOfTheDay.clue;
   const solutionLetter = ClueOfTheDay.solutionLetter;
-  const solutionWord = ClueOfTheDay.solutionWord;
+  //const solutionWord = ClueOfTheDay.solutionWord;
   const solutionExplanation = ClueOfTheDay.solutionExplanation;
 
   Modal.setAppElement("body");
 
   const [input, setInput] = React.useState<string>("");
+  const [guessStatus, setGuessStatus] = React.useState<GuessStatus>(
+    GuessStatus.None
+  );
+  const [disableGuess, setDisableGuess] = React.useState<boolean>(false);
   const [showGameOverDisplay, setShowGameOverDisplay] =
     React.useState<boolean>(false);
   const [showModal, setShowModal] = React.useState<boolean>(false);
@@ -80,33 +84,23 @@ export function Game() {
     ...InitialGameData,
   });
 
+  const updateGuessStatus = (status: GuessStatus, currentScore: number): void => {
+    if(currentScore !== 0) {    
+      setGuessStatus(status);
+      setDisableGuess(true);
+
+      if(status === GuessStatus.Incorrect) {
+        setTimeout(() => {
+          setGuessStatus(GuessStatus.None);
+          setDisableGuess(false);
+          setInput("");
+        }, 1500);
+      }
+    }
+  };
+
   const gameOver = React.useCallback(
     (result: Result, data: GameData) => {
-      switch (result) {
-        case Result.Win:
-          window.alert(
-            "Correct!\n" +
-              input.toUpperCase() +
-              " for " +
-              solutionWord +
-              ".\nThese letters represent " +
-              solutionExplanation +
-              "."
-          );
-          break;
-        case Result.Lose:
-          window.alert(
-            "Game over!\nThe correct answer is " +
-              solutionLetter +
-              ".\nThese letters represent " +
-              solutionExplanation +
-              "."
-          );
-          break;
-        default:
-          break;
-      }
-
       const updatedGameData = {
         ...data,
         isGameOver: true,
@@ -121,13 +115,13 @@ export function Game() {
       setInput(solutionLetter.toUpperCase());
       setShowGameOverDisplay(true);
     },
-    [input, solutionExplanation, solutionLetter, solutionWord, playerData]
+    [playerData, solutionLetter]
   );
 
   const useHint = () => {
     window.alert("Hint:\n" + ClueOfTheDay.hint);
 
-    if(!gameData.hintUsed) {
+    if (!gameData.hintUsed) {
       const updatedData: GameData = {
         ...gameData,
         hintUsed: true,
@@ -172,6 +166,10 @@ export function Game() {
       if (currentGame.isGameOver) {
         setInput(solutionLetter.toUpperCase());
         setShowGameOverDisplay(true);
+
+        if(currentGame.gameOverReason === Result.Win) {
+          setGuessStatus(GuessStatus.Correct);
+        }
       }
     } else {
       localStorage.setItem(GAME_TITLE, JSON.stringify(InitialPlayerData));
@@ -224,21 +222,24 @@ export function Game() {
 
   const makeGuess = () => {
     if (input.toUpperCase() === solutionLetter.toUpperCase()) {
+      updateGuessStatus(GuessStatus.Correct, gameData.currentScore);
       gameOver(Result.Win, gameData);
     } else {
+      const updatedCurrentScore = gameData.currentScore > 0 ? gameData.currentScore - 1 : 0;
+
       let updatedData: GameData = {
         ...gameData,
         guessedLetters: [...gameData.guessedLetters, input.toUpperCase()],
         removedLetters: updatedRemovedLetters(input),
-        currentScore: gameData.currentScore > 0 ? gameData.currentScore - 1 : 0,
+        currentScore: updatedCurrentScore,
       };
+
+      updateGuessStatus(GuessStatus.Incorrect, updatedCurrentScore);
 
       if (gameData.currentScore === 1) {
         gameOver(Result.Lose, updatedData);
       } else {
-        setInput("");
         updateLocalStorage(playerData, updatedData);
-        window.alert("Incorrect!\nNot " + input.toUpperCase() + ".\nTry again.");
       }
     }
   };
@@ -246,13 +247,7 @@ export function Game() {
   return (
     <div>
       <div className="header">
-        <div
-          className="streak"
-          // onClick={(e) => {
-          //   e.preventDefault();
-          //   //window.alert("streak");
-          // }}
-        >
+        <div className="streak">
           <svg
             key={"streak"}
             viewBox="0 0 1024 1024"
@@ -298,7 +293,7 @@ export function Game() {
       <div className="flex-container">
         <div className="board">
           <span id="wave-container" className="clue"></span>
-          <input value={input.toUpperCase()} readOnly />
+          <input className={guessStatus} value={input.toUpperCase()} readOnly />
           {showGameOverDisplay && (
             <span className="solution-description">
               {capitalizeFirstLetter(solutionExplanation)}
@@ -308,6 +303,9 @@ export function Game() {
         {showGameOverDisplay ? (
           <>
             <div className="game-over">
+              {/* <div className="game-over-message">
+                {gameData.gameOverReason === Result.Win ? "Correct!" : ""}
+              </div> */}
               <div className="game-over-score">
                 <span className="your-score">Your score:</span>
                 <Stars
@@ -340,21 +338,23 @@ export function Game() {
             <div className="flex-container-2">
               <div className="buttonBar">
                 <button
-                  className={"hint"}// + (hintUsed ? " disabled" : "")}
+                  className={"hint"} // + (hintUsed ? " disabled" : "")}
                   onClick={useHint}
                   //disabled={hintUsed}
                 >
                   Hint
                 </button>
                 <button
-                  className={"submit" + (input.length === 0 ? " disabled" : "")}
+                  className={
+                    "submit" +
+                    (input.length === 0 || disableGuess ? " disabled" : "")
+                  }
                   onClick={makeGuess}
-                  disabled={input.length === 0}
+                  disabled={input.length === 0 || disableGuess}
                 >
                   Guess
                 </button>
               </div>
-              {/* <div style={{ fontSize: '14px' }}>{'Hints remaining: ' + playerData.hintsLeft}</div> */}
               <div>
                 <Stars
                   gameData={gameData}

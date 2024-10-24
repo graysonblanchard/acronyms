@@ -7,3 +7,9 @@ export enum Result {
 export enum ModalTypes {
     Help = "help"
 }
+
+export enum GuessStatus {
+    Correct = "correct",
+    Incorrect = "incorrect",
+    None = "none"
+}
